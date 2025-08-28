@@ -1,0 +1,5 @@
+# Servir l'API HTTP
+web: gunicorn MoneyTransfer.wsgi:application --bind 0.0.0.0:$PORT
+
+# Servir WebSocket (Channels)
+worker: daphne -b 0.0.0.0 -p 8001 MoneyTransfer.asgi:application
