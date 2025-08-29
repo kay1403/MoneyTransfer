@@ -1,10 +1,12 @@
 #!/bin/bash
-
-# Appliquer les migrations à chaque déploiement
+# Appliquer migrations avant de démarrer
+echo "🚀 Lancement des migrations..."
 python manage.py migrate --noinput
 
-# Collecter les fichiers statiques
+# Collecte des fichiers statiques
+echo "📦 Collecte des fichiers statiques..."
 python manage.py collectstatic --noinput
 
-# Lancer l’app avec gunicorn
+# Lancer l’application avec Gunicorn
+echo "🔥 Démarrage de Gunicorn..."
 gunicorn MoneyTransfer.wsgi:application --bind 0.0.0.0:$PORT
