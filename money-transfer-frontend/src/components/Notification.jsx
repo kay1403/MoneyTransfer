@@ -7,7 +7,7 @@ const Notification = () => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    const ws = new WebSocket(`wss://moneyTransfer.onrender.com/ws/notifications/?token=${token}`);
+    const ws = new WebSocket(`wss://moneyTransfer-db23.onrender.com/ws/notifications/?token=${token}`);
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       setMessages(prev => [...prev, data.message]);
