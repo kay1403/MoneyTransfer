@@ -1,12 +1,32 @@
 from pathlib import Path
 import os
+import dj_database_url
+import urllib.parse
+import environ
 
+# ------------------------
+# Base directory
+# ------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-y=pd$g)ivhw@u$w+%y*+_**8vf_z^upohe+5gvsc^kv!+z)35@'
-DEBUG = True
-ALLOWED_HOSTS = ["127.0.0.1", "localhost","moneyTransfer.onrender.com"]  
-# Application definition
+# ------------------------
+# Charger le .env
+# ------------------------
+env = environ.Env(
+    DEBUG=(bool, True)
+)
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+# ------------------------
+# Sécurité et debug
+# ------------------------
+SECRET_KEY = env('SECRET_KEY')
+DEBUG = env('DEBUG')
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "moneyTransfer.onrender.com"]
+
+# ------------------------
+# Applications installées
+# ------------------------
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -24,18 +44,28 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
-
 ASGI_APPLICATION = "MoneyTransfer.asgi.application"
+
+# ------------------------
+# Redis / Channels
+# ------------------------
+redis_url = env('REDIS_URL', default='redis://127.0.0.1:6379')
+parsed_url = urllib.parse.urlparse(redis_url)
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [(parsed_url.hostname, parsed_url.port)],
+            "password": parsed_url.password,
+            "ssl": parsed_url.scheme == "rediss",  # True si rediss://
         },
     },
 }
 
+# ------------------------
+# REST Framework
+# ------------------------
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -45,6 +75,9 @@ REST_FRAMEWORK = {
     ),
 }
 
+# ------------------------
+# Middleware
+# ------------------------
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -57,11 +90,14 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+    "http://localhost:5173",  # frontend Vite
 ]
 
 ROOT_URLCONF = 'MoneyTransfer.urls'
 
+# ------------------------
+# Templates
+# ------------------------
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -79,13 +115,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'MoneyTransfer.wsgi.application'
 
+# ------------------------
+# Database PostgreSQL externe
+# ------------------------
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.parse(
+        env('DATABASE_URL'),
+        conn_max_age=600
+    )
 }
 
+# ------------------------
+# Validation des mots de passe
+# ------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -93,19 +135,19 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# ------------------------
+# Internationalisation
+# ------------------------
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JS, images)
+# ------------------------
+# Static files (CSS / JS / images)
+# ------------------------
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-#STATICFILES_DIRS = [os.path.join(BASE_DIR, 'money-transfer-frontend', 'dist')]
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'money-transfer-frontend', 'dist')
-]
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Pour collectstatic en prod
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'money-transfer-frontend', 'dist')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # collectstatic en prod
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
