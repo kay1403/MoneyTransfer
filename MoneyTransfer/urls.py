@@ -21,10 +21,12 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('core.urls')),
-    path('api/transactions/', include('transactions.urls')),
+
+    # APIs
+    path('api/core/', include('core.urls')),  
+    path('api/accounts/', include('accounts.urls')),  
+    path('api/transactions/', include('transactions.urls')),  
+
+    # Page d’accueil (frontend)
     path('', TemplateView.as_view(template_name='index.html')),
-    path('api/', include('transactions.urls')),  # backend API
-
-
 ]

@@ -90,7 +90,8 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # frontend Vite
+    #"http://localhost:5173",
+    "https://moneytransfergr.netlify.app",
 ]
 
 ROOT_URLCONF = 'MoneyTransfer.urls'
