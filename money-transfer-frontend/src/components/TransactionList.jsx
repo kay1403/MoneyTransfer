@@ -6,8 +6,13 @@ const TransactionList = () => {
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      const res = await api.get('transactions/');
-      setTransactions(res.data);
+      try {
+        const res = await api.get('transactions/');
+        setTransactions(res.data);
+      } catch (err) {
+        console.log(err);
+        alert('Impossible de récupérer les transactions');
+      }
     };
     fetchTransactions();
   }, []);
