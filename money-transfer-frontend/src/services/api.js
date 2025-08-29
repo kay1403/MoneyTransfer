@@ -1,11 +1,16 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api/';
+// URL de ton backend Render
+const API_URL = 'https://moneyTransfer.onrender.com/api/';
 
 const api = axios.create({
     baseURL: API_URL,
+    headers: {
+        'Content-Type': 'application/json',
+    },
 });
 
+// Fonction pour définir le token JWT
 export const setAuthToken = (token) => {
     if (token) {
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;

@@ -4,14 +4,23 @@ const Notification = () => {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8000/ws/notifications/');
+    // WebSocket sécurisé pour production
+    const ws = new WebSocket('wss://moneyTransfer.onrender.com/ws/notifications/');
+
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
+      // Ajouter le message
       setMessages(prev => [...prev, data.message]);
+      // Supprimer le message après 5 secondes
       setTimeout(() => {
         setMessages(prev => prev.slice(1));
       }, 5000);
     };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
     return () => ws.close();
   }, []);
 
