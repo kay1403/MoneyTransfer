@@ -23,9 +23,8 @@ const TransactionForm = () => {
     if (proof) formData.append('proof', proof);
 
     try {
-      await api.post('transactions/create/', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      // endpoint standardisé : POST sur 'transactions/'
+      await api.post('transactions/', formData);
       alert('Transaction created!');
       setReceiverId('');
       setAmount('');

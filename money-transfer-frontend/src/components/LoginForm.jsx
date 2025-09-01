@@ -1,23 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api, { setAuthToken } from '../services/api';
+import { login, setAuthToken } from '../services/api';
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      const res = await api.post('auth/login/', { username, password });
-      const token = res.data.access;
-      setAuthToken(token); // Met à jour le header
-      localStorage.setItem('token', token); // Sauvegarde le token
-      navigate('/dashboard'); // Redirection
+      const data = await login({ username, password }); // utilise services/api
+      const token = data.access;
+      setAuthToken(token); // met à jour l'instance axios et localStorage
+      navigate('/dashboard');
     } catch (err) {
       console.log(err);
       alert('Identifiants invalides');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -41,8 +44,12 @@ const LoginForm = () => {
           className="w-full p-2 border rounded mb-4"
           required
         />
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
-          Login
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition disabled:opacity-60"
+        >
+          {loading ? 'Logging in...' : 'Login'}
         </button>
       </form>
     </div>

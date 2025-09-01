@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: './',  // <-- changer ici
+  base: './',  // pour que les chemins relatifs fonctionnent
   server: {
     port: 5173,
     proxy: {
@@ -15,6 +15,16 @@ export default defineConfig({
       '/ws': {
         target: 'ws://localhost:8001', // WebSocket pour notifications
         ws: true,
+      },
+    },
+  },
+  build: {
+    outDir: 'dist',
+    rollupOptions: {
+      output: {
+        entryFileNames: `assets/[name].js`,
+        chunkFileNames: `assets/[name].js`,
+        assetFileNames: `assets/[name].[ext]`,
       },
     },
   },

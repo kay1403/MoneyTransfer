@@ -8,10 +8,7 @@ class TransactionCreateView(generics.CreateAPIView):
     parser_classes = (permissions.AllowAny,)  # Pour multipart/form-data
     permission_classes = [permissions.IsAuthenticated]
 
-class TransactionListView(generics.ListAPIView):
+class TransactionListView(generics.ListCreateAPIView):  # <-- ListCreateAPIView au lieu de ListAPIView
+    queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        user = self.request.user
-        return Transaction.objects.filter(sender=user) | Transaction.objects.filter(receiver=user)
+    # Ajoutez permissions si nécessaire

@@ -16,16 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     # APIs
-    path('api/core/', include('core.urls')),  
-    path('api/accounts/', include('accounts.urls')),  
-    path('api/transactions/', include('transactions.urls')),  
+    path('api/core/', include('core.urls')),
+    path('api/accounts/', include('accounts.urls')),
+    path('api/transactions/', include('transactions.urls')),
+
+    # Alias attendu par le frontend -> /api/auth/login/, /api/auth/register/
+    path('api/auth/', include('accounts.urls')),
+
+    # Redirect /api/ to the core API index to avoid Page not found
+    path('api/', RedirectView.as_view(url='/api/core/', permanent=False)),
 
     # Page d’accueil (frontend)
     path('', TemplateView.as_view(template_name='index.html')),
