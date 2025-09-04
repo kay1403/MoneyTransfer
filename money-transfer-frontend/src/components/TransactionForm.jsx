@@ -18,6 +18,7 @@ const TransactionForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLastTransactionId(null); // reset avant nouvelle transaction
     const formData = new FormData();
     formData.append('receiver', receiverId);
     formData.append('amount_sender', amount);
