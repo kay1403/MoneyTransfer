@@ -108,6 +108,20 @@ CORS_ALLOWED_ORIGINS = [
     "https://moneytransfergr.netlify.app",
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://moneytransfergr.netlify.app"
+]
+
+# ------------------------
+# HTTPS & sécurité cookies
+# ------------------------
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
 ROOT_URLCONF = 'MoneyTransfer.urls'
 
 # ------------------------
@@ -161,14 +175,38 @@ USE_I18N = True
 USE_TZ = True
 
 # ------------------------
-# Static files (CSS / JS / images)
+# Static & Media
 # ------------------------
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'money-transfer-frontend', 'dist'),
 ]
-
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ------------------------
+# Logging production
+# ------------------------
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/django.log'),
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
