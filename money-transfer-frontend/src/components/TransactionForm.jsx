@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { createTransaction } from '../services/api';
+import { createTransaction, downloadReceipt } from '../services/api';
 
 const TransactionForm = () => {
   const [receiverId, setReceiverId] = useState('');
@@ -8,6 +8,7 @@ const TransactionForm = () => {
   const [preview, setPreview] = useState(null);
   const [currencySender, setCurrencySender] = useState('XAF');
   const [currencyReceiver, setCurrencyReceiver] = useState('RWF');
+  const [lastTransactionId, setLastTransactionId] = useState(null);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -25,15 +26,26 @@ const TransactionForm = () => {
     if (proof) formData.append('proof', proof);
 
     try {
-      await createTransaction(formData);
+      const transaction = await createTransaction(formData);
       alert('Transaction created!');
       setReceiverId('');
       setAmount('');
       setProof(null);
       setPreview(null);
+      setLastTransactionId(transaction.id); // sauvegarde ID pour le PDF
     } catch (err) {
       console.error(err);
       alert('Error creating transaction');
+    }
+  };
+
+  const handleDownloadReceipt = async () => {
+    if (!lastTransactionId) return;
+    try {
+      await downloadReceipt(lastTransactionId);
+    } catch (err) {
+      console.error(err);
+      alert('Error downloading receipt');
     }
   };
 
@@ -56,8 +68,28 @@ const TransactionForm = () => {
           className="w-full p-2 border rounded"
           required
         />
+        <div className="flex space-x-2">
+          <input
+            placeholder="Sender Currency"
+            value={currencySender}
+            onChange={e => setCurrencySender(e.target.value)}
+            className="w-1/2 p-2 border rounded"
+          />
+          <input
+            placeholder="Receiver Currency"
+            value={currencyReceiver}
+            onChange={e => setCurrencyReceiver(e.target.value)}
+            className="w-1/2 p-2 border rounded"
+          />
+        </div>
         <input type="file" onChange={handleFileChange} className="w-full" />
-        {preview && <img src={preview} alt="proof preview" className="mt-2 w-32 h-32 object-cover rounded" />}
+        {preview && (
+          <img
+            src={preview}
+            alt="proof preview"
+            className="mt-2 w-32 h-32 object-cover rounded"
+          />
+        )}
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
@@ -65,6 +97,15 @@ const TransactionForm = () => {
           Send
         </button>
       </form>
+
+      {lastTransactionId && (
+        <button
+          onClick={handleDownloadReceipt}
+          className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition mt-4"
+        >
+          Télécharger le reçu PDF
+        </button>
+      )}
     </div>
   );
 };
