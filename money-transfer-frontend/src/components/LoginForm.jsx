@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login, setAuthToken } from '../services/api';
+import { login } from '../services/api';
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
@@ -12,9 +12,8 @@ const LoginForm = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const data = await login({ username, password }); // utilise services/api
-      const token = data.access;
-      setAuthToken(token); // met à jour l'instance axios et localStorage
+      const user = await login({ username, password });
+      console.log('Logged in user:', user);
       navigate('/dashboard');
     } catch (err) {
       console.log(err);
@@ -32,7 +31,7 @@ const LoginForm = () => {
           type="text"
           placeholder="Username"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={e => setUsername(e.target.value)}
           className="w-full p-2 border rounded mb-2"
           required
         />
@@ -40,7 +39,7 @@ const LoginForm = () => {
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={e => setPassword(e.target.value)}
           className="w-full p-2 border rounded mb-4"
           required
         />
