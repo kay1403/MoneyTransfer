@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import api from '../services/api';
+import { getTransactions } from '../services/api';
 
 const TransactionList = () => {
   const [transactions, setTransactions] = useState([]);
@@ -7,8 +7,8 @@ const TransactionList = () => {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const res = await api.get('transactions/');
-        setTransactions(res.data);
+        const data = await getTransactions();
+        setTransactions(data);
       } catch (err) {
         console.log(err);
         alert('Impossible de récupérer les transactions');
@@ -28,7 +28,7 @@ const TransactionList = () => {
 
   return (
     <div className="p-4 bg-white rounded shadow-md">
-      <h3 className="text-lg font-bold mb-2">My Transactions</h3>
+      <h3 className="text-lg font-bold mb-2">Mes transactions</h3>
       <ul className="space-y-2">
         {transactions.map(tx => (
           <li key={tx.id} className="flex justify-between items-center p-2 border rounded">
