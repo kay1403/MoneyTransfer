@@ -1,32 +1,31 @@
 from rest_framework import generics, permissions
 from rest_framework.parsers import MultiPartParser, FormParser
-from .models import Transaction
-from .serializers import TransactionSerializer
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .models import Transaction
-from .utils import generate_receipt
+from .serializers import TransactionSerializer
+from .utils import generate_receipt, send_transaction_notification
 
+# --- Create transaction ---
 class TransactionCreateView(generics.CreateAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
-    parser_classes = [MultiPartParser, FormParser]  # nécessaire pour upload fichiers
+    parser_classes = [MultiPartParser, FormParser]  # upload fichiers
     permission_classes = [permissions.IsAuthenticated]
 
+# --- List transactions for sender/receiver ---
 class TransactionListView(generics.ListAPIView):
     serializer_class = TransactionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        # Retourne toutes les transactions où l'utilisateur est sender ou receiver
         return Transaction.objects.filter(sender=user) | Transaction.objects.filter(receiver=user)
 
+# --- Confirm transaction (receiver) ---
 class TransactionConfirmView(generics.UpdateAPIView):
-    """
-    Permet au receiver de confirmer qu'il a envoyé le Mobile Money
-    """
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -36,15 +35,16 @@ class TransactionConfirmView(generics.UpdateAPIView):
         user = request.user
         if transaction.receiver != user:
             return Response({"detail": "Unauthorized"}, status=403)
+        
         transaction.status = 'CONFIRMED'
         transaction.save()
 
-        # Ici, tu pourrais générer un PDF ou un reçu numérique
-        from .utils import send_transaction_notification
+        # Notification en temps réel au sender
         send_transaction_notification(transaction)
 
         return Response({"detail": "Transaction confirmed"})
 
+# --- Download PDF receipt ---
 class TransactionReceiptView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -53,4 +53,6 @@ class TransactionReceiptView(APIView):
         user = request.user
         if transaction.sender != user and transaction.receiver != user:
             return Response({"detail": "Unauthorized"}, status=403)
+        
+        # Génère et retourne le PDF
         return generate_receipt(transaction)
