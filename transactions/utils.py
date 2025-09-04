@@ -3,6 +3,9 @@ from PIL import Image
 import pytesseract
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
+import io
 
 def get_exchange_rate(from_currency: str, to_currency: str):
     API_KEY = 'VOTRE_API_KEY_EXCHANGE'
@@ -35,3 +38,16 @@ def send_transaction_notification(transaction):
             "message": message
         }
     )
+
+def generate_receipt(transaction):
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer)
+    p.drawString(100, 800, f"Transaction Receipt #{transaction.id}")
+    p.drawString(100, 780, f"Sender: {transaction.sender.username}")
+    p.drawString(100, 760, f"Receiver: {transaction.receiver.username}")
+    p.drawString(100, 740, f"Amount: {transaction.amount_receiver} {transaction.currency_receiver}")
+    p.drawString(100, 720, f"Status: {transaction.status}")
+    p.showPage()
+    p.save()
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename=f'receipt_{transaction.id}.pdf')
