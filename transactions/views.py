@@ -2,6 +2,11 @@ from rest_framework import generics, permissions
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import Transaction
 from .serializers import TransactionSerializer
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
+from .models import Transaction
+from .utils import generate_receipt
 
 class TransactionCreateView(generics.CreateAPIView):
     queryset = Transaction.objects.all()
@@ -39,3 +44,13 @@ class TransactionConfirmView(generics.UpdateAPIView):
         send_transaction_notification(transaction)
 
         return Response({"detail": "Transaction confirmed"})
+
+class TransactionReceiptView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        transaction = get_object_or_404(Transaction, pk=pk)
+        user = request.user
+        if transaction.sender != user and transaction.receiver != user:
+            return Response({"detail": "Unauthorized"}, status=403)
+        return generate_receipt(transaction)
