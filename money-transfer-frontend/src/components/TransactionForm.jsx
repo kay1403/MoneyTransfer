@@ -6,6 +6,8 @@ const TransactionForm = () => {
   const [amount, setAmount] = useState('');
   const [proof, setProof] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [currencySender, setCurrencySender] = useState('XAF');
+  const [currencyReceiver, setCurrencyReceiver] = useState('RWF');
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -18,8 +20,8 @@ const TransactionForm = () => {
     const formData = new FormData();
     formData.append('receiver', receiverId);
     formData.append('amount_sender', amount);
-    formData.append('currency_sender', 'XAF');
-    formData.append('currency_receiver', 'RWF');
+    formData.append('currency_sender', currencySender);
+    formData.append('currency_receiver', currencyReceiver);
     if (proof) formData.append('proof', proof);
 
     try {
@@ -54,18 +56,8 @@ const TransactionForm = () => {
           className="w-full p-2 border rounded"
           required
         />
-        <input
-          type="file"
-          onChange={handleFileChange}
-          className="w-full"
-        />
-        {preview && (
-          <img
-            src={preview}
-            alt="proof preview"
-            className="mt-2 w-32 h-32 object-cover rounded"
-          />
-        )}
+        <input type="file" onChange={handleFileChange} className="w-full" />
+        {preview && <img src={preview} alt="proof preview" className="mt-2 w-32 h-32 object-cover rounded" />}
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
