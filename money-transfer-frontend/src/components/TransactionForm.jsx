@@ -15,11 +15,6 @@ const TransactionForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (amount <= 0) {
-      alert('Le montant doit être supérieur à 0');
-      return;
-    }
-
     const formData = new FormData();
     formData.append('receiver', receiverId);
     formData.append('amount_sender', amount);
@@ -29,30 +24,30 @@ const TransactionForm = () => {
 
     try {
       await createTransaction(formData);
-      alert('Transaction créée !');
+      alert('Transaction created!');
       setReceiverId('');
       setAmount('');
       setProof(null);
       setPreview(null);
     } catch (err) {
-      console.log(err);
-      alert('Erreur lors de la transaction');
+      console.error(err);
+      alert('Error creating transaction');
     }
   };
 
   return (
     <div className="bg-white p-6 rounded shadow-md w-full max-w-md mx-auto">
-      <h2 className="text-xl font-bold mb-4">Envoyer de l'argent</h2>
+      <h2 className="text-xl font-bold mb-4">Send Money</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
-          placeholder="ID du destinataire"
+          placeholder="Receiver ID"
           value={receiverId}
           onChange={e => setReceiverId(e.target.value)}
           className="w-full p-2 border rounded"
           required
         />
         <input
-          placeholder="Montant"
+          placeholder="Amount"
           value={amount}
           onChange={e => setAmount(e.target.value)}
           type="number"
@@ -64,9 +59,18 @@ const TransactionForm = () => {
           onChange={handleFileChange}
           className="w-full"
         />
-        {preview && <img src={preview} alt="proof preview" className="mt-2 w-32 h-32 object-cover rounded"/>}
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
-          Envoyer
+        {preview && (
+          <img
+            src={preview}
+            alt="proof preview"
+            className="mt-2 w-32 h-32 object-cover rounded"
+          />
+        )}
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+        >
+          Send
         </button>
       </form>
     </div>
