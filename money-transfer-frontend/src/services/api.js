@@ -38,6 +38,26 @@ export const convertCurrency = async (fromCurrency, toCurrency, amount) => {
   return response.data;
 };
 
+// --- Download PDF receipt ---
+export const downloadReceipt = async (transactionId) => {
+  const token = localStorage.getItem('access'); // ou selon où tu stockes le JWT
+  const response = await fetch(`${API_URL}transactions/receipt/${transactionId}/`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) throw new Error('Failed to download receipt');
+  const blob = await response.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `receipt_${transactionId}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+};
+
 export default api;
 
 // --- Interceptor refresh automatique ---
