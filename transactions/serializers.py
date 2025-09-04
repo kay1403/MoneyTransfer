@@ -13,8 +13,8 @@ class TransactionSerializer(serializers.ModelSerializer):
         rate = get_exchange_rate(validated_data['currency_sender'], validated_data['currency_receiver'])
         if not rate:
             raise serializers.ValidationError("Impossible de récupérer le taux de change.")
-
         validated_data['amount_receiver'] = validated_data['amount_sender'] * rate
+
         transaction = Transaction.objects.create(**validated_data)
 
         # Vérification automatique si preuve uploadée
