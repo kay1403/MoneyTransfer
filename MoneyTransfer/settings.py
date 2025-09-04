@@ -3,6 +3,7 @@ import os
 import dj_database_url
 import urllib.parse
 import environ
+from datetime import timedelta
 
 # ------------------------
 # Base directory
@@ -13,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Charger le .env
 # ------------------------
 env = environ.Env(
-    DEBUG=(bool, True)
+    DEBUG=(bool, False)
 )
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
@@ -22,7 +23,13 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # ------------------------
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
-ALLOWED_HOSTS = ["moneytransfer-db23.onrender.com", "moneytransfer.onrender.com", "127.0.0.1", "localhost"]
+ALLOWED_HOSTS = [
+    "moneytransfer-db23.onrender.com",
+    "moneytransfer.onrender.com",
+    "127.0.0.1",
+    "localhost"
+]
+
 # ------------------------
 # Applications installées
 # ------------------------
@@ -57,7 +64,7 @@ CHANNEL_LAYERS = {
         "CONFIG": {
             "hosts": [(parsed_url.hostname, parsed_url.port)],
             "password": parsed_url.password,
-            "ssl": parsed_url.scheme == "rediss",  # True si rediss://
+            "ssl": parsed_url.scheme == "rediss",
         },
     },
 }
@@ -68,14 +75,13 @@ CHANNEL_LAYERS = {
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-        "rest_framework.authentication.SessionAuthentication",  # pour browsable API
+        "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
 }
 
-from datetime import timedelta
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
@@ -98,7 +104,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",                 
+    "http://localhost:5173",
     "https://moneytransfergr.netlify.app",
 ]
 
@@ -163,6 +169,6 @@ STATICFILES_DIRS = [
 ]
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # collectstatic en prod
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
