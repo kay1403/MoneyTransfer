@@ -2,21 +2,16 @@ import React, { useEffect } from 'react';
 import TransactionForm from '../components/TransactionForm';
 import TransactionList from '../components/TransactionList';
 import Notification from '../components/Notification';
+import { isAuthenticated } from '../services/auth';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        await api.get('core/transactions/'); // teste accès avec cookie httpOnly
-      } catch (err) {
-        navigate('/'); // redirige vers login si pas auth
-      }
-    };
-    checkAuth();
+    if (!isAuthenticated()) {
+      navigate('/'); // Redirige vers login si pas connecté
+    }
   }, [navigate]);
 
   return (
