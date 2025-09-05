@@ -1,6 +1,7 @@
+// src/components/LoginForm.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../services/auth';
+import { login } from '../services/api';
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
@@ -12,10 +13,10 @@ const LoginForm = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await loginUser({ username, password });
+      await login({ username, password });
       navigate('/dashboard');
     } catch (err) {
-      console.error(err);
+      console.error(err.response?.data || err.message);
       alert('Identifiants invalides');
     } finally {
       setLoading(false);
@@ -33,6 +34,7 @@ const LoginForm = () => {
           onChange={(e) => setUsername(e.target.value)}
           className="w-full p-2 border rounded mb-2"
           required
+          autoComplete="username"
         />
         <input
           type="password"

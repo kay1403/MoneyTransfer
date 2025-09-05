@@ -1,3 +1,4 @@
+// src/services/api.js
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api/';
@@ -5,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL || '/api/';
 const api = axios.create({
   baseURL: API_URL,
   timeout: 10000,
-  withCredentials: true, // pour cookies httpOnly
+  withCredentials: true,
 });
 
 // --- Auth Token helpers ---
@@ -26,16 +27,17 @@ export const login = async (credentials) => {
   const response = await api.post('accounts/login/', credentials);
   const { access } = response.data;
   setAuthToken(access);
-  return response.data; // {access, refresh}
-};
-
-export const register = async (userData) => {
-  const response = await api.post('accounts/register/', userData);
   return response.data;
 };
 
+export const register = async (userData) => {
+  const response = await api.post('accounts/register/', userData, {
+    headers: { 'Accept': 'application/json' }
+  });
+  return response.data;
+};
 
-// logout : juste supprimer côté frontend
+// logout
 export const logout = () => {
   setAuthToken(null);
   window.location.href = '/';
@@ -53,7 +55,6 @@ export const createTransaction = async (formData) => {
   });
   return response.data;
 };
-
 
 // --- Currency conversion ---
 export const convertCurrency = async (fromCurrency, toCurrency, amount) => {

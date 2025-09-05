@@ -1,6 +1,6 @@
 // src/pages/RegisterPage.jsx
 import React, { useState } from "react";
-import { register } from "../services/api"; // on l’ajoutera dans api.js
+import { register } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
 function RegisterPage() {
@@ -14,10 +14,12 @@ function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     try {
       await register(formData);
-      navigate("/login"); // après inscription, redirige vers login
+      navigate("/login");
     } catch (err) {
+      console.error(err.response?.data || err.message);
       setError("Erreur lors de l'inscription");
     }
   };
@@ -56,9 +58,8 @@ function RegisterPage() {
           onChange={handleChange}
           className="w-full p-2 border rounded mb-4"
           required
-          autoComplete="current-password"
+          autoComplete="new-password"
         />
-
 
         <button
           type="submit"
