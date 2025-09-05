@@ -8,6 +8,21 @@ const api = axios.create({
   withCredentials: true, // pour cookies httpOnly
 });
 
+// --- Auth Token helpers ---
+export const setAuthToken = (token) => {
+  if (token) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    localStorage.setItem('access', token);
+  } else {
+    delete api.defaults.headers.common['Authorization'];
+    localStorage.removeItem('access');
+  }
+};
+
+export const getToken = () => {
+  return localStorage.getItem('access');
+};
+
 // --- Auth ---
 export const login = async (credentials) => {
   const response = await api.post('core/login/', credentials);
@@ -16,6 +31,7 @@ export const login = async (credentials) => {
 
 // logout : juste supprimer côté frontend
 export const logout = () => {
+  setAuthToken(null);
   window.location.href = '/';
 };
 
@@ -40,7 +56,7 @@ export const convertCurrency = async (fromCurrency, toCurrency, amount) => {
 
 // --- Download PDF receipt ---
 export const downloadReceipt = async (transactionId) => {
-  const token = localStorage.getItem('access'); // ou selon où tu stockes le JWT
+  const token = getToken();
   const response = await fetch(`${API_URL}transactions/receipt/${transactionId}/`, {
     method: 'GET',
     headers: {

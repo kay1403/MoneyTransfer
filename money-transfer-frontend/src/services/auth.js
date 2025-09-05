@@ -3,10 +3,10 @@ import api, { setAuthToken, getToken } from './api';
 // --- LOGIN ---
 export const loginUser = async (credentials) => {
   try {
-    const data = await api.post('accounts/login/', credentials);
-    const token = data.access || data.token; // selon backend
+    const res = await api.post('accounts/login/', credentials);
+    const token = res.data.access || res.data.token; // selon backend
     if (token) setAuthToken(token);
-    return data;
+    return res.data;
   } catch (err) {
     throw err;
   }
