@@ -19,21 +19,18 @@ export const setAuthToken = (token) => {
   }
 };
 
-export const getToken = () => {
-  return localStorage.getItem('access');
-};
+export const getToken = () => localStorage.getItem('access');
 
 // --- Auth ---
 export const login = async (credentials) => {
   const response = await api.post('accounts/login/', credentials);
-  // le backend renvoie access + refresh → on stocke access
   const { access } = response.data;
   setAuthToken(access);
-  return response.data; // tu récupères {access, refresh}
+  return response.data; // {access, refresh}
 };
 
-export const register = async (credentials) => {
-  const response = await api.post('accounts/register/', credentials);
+export const register = async (userData) => {
+  const response = await api.post('accounts/register/', userData);
   return response.data;
 };
 
@@ -71,9 +68,7 @@ export const downloadReceipt = async (transactionId) => {
   const token = getToken();
   const response = await fetch(`${API_URL}transactions/receipt/${transactionId}/`, {
     method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (!response.ok) throw new Error('Failed to download receipt');
   const blob = await response.blob();
@@ -101,7 +96,7 @@ api.interceptors.response.use(
         });
         const { access } = refreshResponse.data;
         setAuthToken(access);
-        return api(originalRequest); // retry request
+        return api(originalRequest);
       } catch (err) {
         logout();
         return Promise.reject(err);
