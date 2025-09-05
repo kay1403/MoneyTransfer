@@ -25,8 +25,16 @@ export const getToken = () => {
 
 // --- Auth ---
 export const login = async (credentials) => {
-  const response = await api.post('core/login/', credentials);
-  return response.data.user; // user info seulement
+  const response = await api.post('accounts/login/', credentials);
+  // le backend renvoie access + refresh → on stocke access
+  const { access } = response.data;
+  setAuthToken(access);
+  return response.data; // tu récupères {access, refresh}
+};
+
+export const register = async (credentials) => {
+  const response = await api.post('accounts/register/', credentials);
+  return response.data;
 };
 
 // logout : juste supprimer côté frontend
@@ -37,12 +45,12 @@ export const logout = () => {
 
 // --- Transactions ---
 export const getTransactions = async () => {
-  const response = await api.get('core/transactions/');
+  const response = await api.get('transactions/');
   return response.data;
 };
 
 export const createTransaction = async (formData) => {
-  const response = await api.post('core/transactions/', formData, {
+  const response = await api.post('transactions/', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
   return response.data;
@@ -50,7 +58,11 @@ export const createTransaction = async (formData) => {
 
 // --- Currency conversion ---
 export const convertCurrency = async (fromCurrency, toCurrency, amount) => {
-  const response = await api.post('core/convert/', { from_currency: fromCurrency, to_currency: toCurrency, amount });
+  const response = await api.post('core/convert/', {
+    from_currency: fromCurrency,
+    to_currency: toCurrency,
+    amount,
+  });
   return response.data;
 };
 
@@ -84,7 +96,11 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        await api.post('core/token/refresh/', {}, { withCredentials: true });
+        const refreshResponse = await api.post('accounts/token/refresh/', {
+          refresh: localStorage.getItem('refresh'),
+        });
+        const { access } = refreshResponse.data;
+        setAuthToken(access);
         return api(originalRequest); // retry request
       } catch (err) {
         logout();
