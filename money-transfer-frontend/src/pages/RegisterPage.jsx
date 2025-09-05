@@ -31,7 +31,7 @@ function RegisterPage() {
         <h2 className="text-xl font-bold mb-4">Créer un compte</h2>
         {error && <p className="text-red-500">{error}</p>}
 
-                <input
+        <input
           type="text"
           name="username"
           placeholder="Nom d'utilisateur"
@@ -56,7 +56,7 @@ function RegisterPage() {
           onChange={handleChange}
           className="w-full p-2 border rounded mb-4"
           required
-          autoComplete="new-password"
+          autoComplete="current-password"
         />
 
 
