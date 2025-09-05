@@ -12,9 +12,8 @@ from .utils import generate_receipt, send_transaction_notification
 class TransactionCreateView(generics.CreateAPIView):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
-    parser_classes = [MultiPartParser, FormParser]  # upload fichiers
-    permission_classes = [permissions.IsAuthenticated]
-
+    parser_classes=[MultiPartParser, FormParser]   
+    permission_classes=[IsAuthenticated]
 # --- List transactions for sender/receiver ---
 class TransactionListView(generics.ListAPIView):
     serializer_class = TransactionSerializer

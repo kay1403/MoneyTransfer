@@ -34,6 +34,7 @@ export const register = async (userData) => {
   return response.data;
 };
 
+
 // logout : juste supprimer côté frontend
 export const logout = () => {
   setAuthToken(null);
@@ -47,11 +48,12 @@ export const getTransactions = async () => {
 };
 
 export const createTransaction = async (formData) => {
-  const response = await api.post('transactions/', formData, {
+  const response = await api.post('transactions/create/', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
   return response.data;
 };
+
 
 // --- Currency conversion ---
 export const convertCurrency = async (fromCurrency, toCurrency, amount) => {
