@@ -112,6 +112,23 @@ CORS_ALLOWED_ORIGINS = [
 CSRF_TRUSTED_ORIGINS = [
     "https://moneytransfergr.netlify.app"
 ]
+# Autoriser l’envoi des cookies cross-site
+CORS_ALLOW_CREDENTIALS = True
+
+# Permettre tous les headers nécessaires (optionnel mais conseillé)
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# CORS_ALLOW_ALL_ORIGINS = False (on reste sur CORS_ALLOWED_ORIGINS)
 
 # ------------------------
 # HTTPS & sécurité cookies
