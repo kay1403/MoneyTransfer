@@ -8,7 +8,8 @@ from datetime import timedelta
 # ------------------------
 # Base directory
 # ------------------------
-BASE_DIR = Path(__file__).resolve().parent.parent
+#BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # ------------------------
 # Charger le .env
@@ -192,22 +193,34 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ------------------------
 # Logging production
 # ------------------------
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+if not os.path.exists(LOG_DIR):
+    try:
+        os.makedirs(LOG_DIR)
+    except PermissionError:
+        # Sur Render ou autre plateforme read-only, utiliser /tmp
+        LOG_DIR = '/tmp'
+
+LOG_FILE = os.path.join(LOG_DIR, 'django.log')
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
         'file': {
-            'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs' / 'django.log',
-            'maxBytes': 5*1024*1024,  # 5 MB
-            'backupCount': 5,
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': LOG_FILE,
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
         },
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
+            'handlers': ['file', 'console'],  # log à la fois dans le fichier et la console
+            'level': 'INFO',
             'propagate': True,
         },
     },
